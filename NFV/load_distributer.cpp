@@ -14,7 +14,6 @@ struct server_data{
 	vector<double> tps_parts;
 };
 
-
 Server::Server(){
 	Server::tps_load = Server::getMax(Server::tps_parts);
 	Server::net_out = Server::net_stats[1];
