@@ -10,54 +10,19 @@
 #include <stdexcept>
 #include <sstream>
 
+#include "file_handler.h"
+
 using namespace std;
 
-class File_manipulator{
-public:
-	File_manipulator(string file_name){
-		file_path = getRealpath(file_name);
-		this->file_name = getFileName(file_name);
 
-		ip_file.open(file_name.c_str(), ios::in | ios::binary);
-		if(ip_file.fail())
-			throw runtime_error("File open failed");
-	}
+File_manipulator::File_manipulator(string file_name){
+	file_path = getRealpath(file_name);
+	this->file_name = getFileName(file_name);
 
-	bool makeChunks(string path_name);
-	bool makeChunks(){return makeChunks(file_path);}
-
-private:
-	ifstream ip_file;
-	string file_name;
-	string file_path;
-	static const int fileChunkLen = 64; // in bytes
-
-	string getRealpath(string fileName){
-		char realpth[PATH_MAX + 1];
-		if(realpath(fileName.c_str(), realpth) == NULL){
-			perror("RealPath could not be found ");
-			throw runtime_error("RealPath could not be found");
-		}
-		string s_realpth(realpth);
-		
-		char sep = '/';
-		size_t i = s_realpth.rfind(sep, s_realpth.length());
-		if (i != string::npos)
-	      return(s_realpth.substr(0, i+1));
-	  	throw runtime_error("RealPath could not be extracted");
-	}
-
-	string getFileName(string fileName){
-		char sep = '/';
-
-	   size_t i = fileName.rfind(sep, fileName.length());
-	   if (i != string::npos)
-	      return(fileName.substr(i+1, fileName.length() - i));
-	   
-	   return(fileName);
-	}
-
-};
+	ip_file.open(file_name.c_str(), ios::in | ios::binary);
+	if(ip_file.fail())
+		throw runtime_error("File open failed");
+}
 
 bool File_manipulator::makeChunks(string path_name){
 	//ifstream _ip_file;
@@ -109,12 +74,36 @@ bool File_manipulator::makeChunks(string path_name){
 		cout << ip_file.gcount() << " bytes written to " << files.str() << endl;
 	}
 	return true;
+}
 
+string File_manipulator::getRealpath(string fileName){
+	char realpth[PATH_MAX + 1];
+	if(realpath(fileName.c_str(), realpth) == NULL){
+		perror("RealPath could not be found ");
+		throw runtime_error("RealPath could not be found");
+	}
+	string s_realpth(realpth);
+	
+	char sep = '/';
+	size_t i = s_realpth.rfind(sep, s_realpth.length());
+	if (i != string::npos)
+		return(s_realpth.substr(0, i+1));
+	throw runtime_error("RealPath could not be extracted");
+}
+
+string File_manipulator::getFileName(string fileName){
+	char sep = '/';
+
+	size_t i = fileName.rfind(sep, fileName.length());
+	if (i != string::npos)
+		return(fileName.substr(i+1, fileName.length() - i));
+
+	return(fileName);
 }
 
 int main(int argc, char** argv){
 
-	File_manipulator fm("empty");
+	File_manipulator fm("/home/prameet/ACN-Project/Content/empty");
 	fm.makeChunks();
 	return 0;
 }
