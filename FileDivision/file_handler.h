@@ -6,15 +6,21 @@ public:
 
 	File_manipulator(string file_name);
 
+	/* Make file at specified path_name */
 	bool makeChunks(string path_name);
-	bool makeChunks(){return makeChunks(file_path);}
+
+	/* Make file at base_file_path */
+	bool makeChunks(){return makeChunks(base_file_path);};
 
 private:
 	ifstream ip_file;
 	string file_name;
 	string file_path;
+	static const string base_file_path;
 	static const int fileChunkLen = 64; // in bytes
 
 	string getRealpath(string fileName);
 	string getFileName(string fileName);
 };
+
+const string File_manipulator::base_file_path = "/home/prameet/ACN-Project/Client/";
