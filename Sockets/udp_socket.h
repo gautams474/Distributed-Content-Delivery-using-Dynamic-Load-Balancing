@@ -1,12 +1,16 @@
 #ifndef UDP_SOCKET
 #define UDP_SOCKET
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
 using namespace std;
 
 class UDP_Socket{
 public:
-	UDP_Socket(string dest_port, string dest_address, string source_port, 
-					string source_address, bool isServer);
+	UDP_Socket(string dest_port, string dest_address, string source_port,   
+					string source_address, bool isServer);  //1
 
 	UDP_Socket(string source_port, string source_address, bool isServer);
 
@@ -14,7 +18,7 @@ public:
 
 	bool setDestination(string port, string address, bool shouldConnect);
 
-	bool send_to(char* buf, int len, int& numbytes);
+	bool send_to(char* buf, int len, int& numbytes); //1
 
 	bool send_to(char* buf, int len, int& numbytes, string& dest_port, string dest_address);
 
@@ -46,6 +50,7 @@ private:
 	bool isConnected;
 	bool isServer;
 
+	static const char delim = '^';
 	string dest_port;
 	string dest_address;
 	string my_ip;

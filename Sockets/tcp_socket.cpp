@@ -1,11 +1,8 @@
 #include <cstdio>
 #include <cstdlib>
-#include <unistd.h>
 #include <errno.h>
 #include <cstring>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
@@ -355,7 +352,7 @@ bool TCP_Socket::isEqual_address(struct sockaddr_in* lhs, struct sockaddr_in* rh
 	return true;
 }
 
-
+/*
 int main(int argc, char** argv){
 
 	cout << "server ? 1== yes and 0 == no " << endl;
@@ -392,4 +389,4 @@ int main(int argc, char** argv){
 	}
 
 	return 0;
-}
+}*/

@@ -6,6 +6,14 @@ const double MAX_TPS_LOAD = 70;
 const double MAX_NET_LOAD = 10000; //10MB/s
 const int NO_OF_SERVERS = 3;
 
+
+struct server_data{
+	int cores;
+	vector<double> net_stats;
+	vector<double> cpu_loads;
+	vector<double> tps_parts;
+};
+
 class Server{
 	public :
 	

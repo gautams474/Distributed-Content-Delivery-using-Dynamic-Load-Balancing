@@ -5,3 +5,4 @@ for i in $( ls ); do
 		then cd "$i" && make; cd ../;
 	fi;
 done
+cd NFV/ && g++ -I ./../Sockets/ receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o; cd ../
