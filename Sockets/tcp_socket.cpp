@@ -3,7 +3,6 @@
 #include <errno.h>
 #include <cstring>
 #include <sys/types.h>
-#include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -37,7 +36,8 @@ TCP_Socket::TCP_Socket(string dest_port, string dest_address, string source_port
 			}
 		}
 
-		connect_to_destination();
+		if(connect_to_destination() == false)
+			cout << "Can not connect to destination" << endl;
 }
 
 TCP_Socket::TCP_Socket(string source_port, string source_address, bool isServer){
@@ -94,7 +94,12 @@ bool TCP_Socket::receiveData(char* buf, int bufLen, int& numbytes){
 		cerr << "cannot receive data as socket is not connected." << endl;
 		return false;
 	}
-	numbytes = recv(sockfd, buf, bufLen, MSG_WAITALL);
+	unsigned int total_numbytes=0;
+	while(total_numbytes != bufLen){
+		numbytes = recv(sockfd, buf, bufLen-total_numbytes, MSG_WAITALL);
+		total_numbytes += numbytes;
+	}
+	numbytes = total_numbytes;
 	return true;
 }
 
@@ -115,7 +120,7 @@ bool TCP_Socket::connect_to_destination(void){
 	specified_addr.sin_port = htons(i_my_port);
 	if((ret = inet_pton(AF_INET, dest_address.c_str(), &(specified_addr.sin_addr))) <= 0){  // IPv4
 		if(ret == 0){
-			cerr << "incorrect IP address" << endl;
+			cerr << "incorrect IP address " << dest_address <<  endl;
 			throw runtime_error("incorrect IP address" );
 		}
 		else{
@@ -196,7 +201,7 @@ bool TCP_Socket::setUpSpecificAddress(string& msg, sockaddr_in& specified_addr, 
 
 		if((ret = inet_pton(AF_INET, my_ip.c_str(), &(specified_addr.sin_addr))) <= 0){  // IPv4
 			if(ret == 0){
-				cerr << "incorrect IP address" << endl;
+				cerr << "incorrect IP address " << my_ip << endl;
 				throw runtime_error("incorrect IP address" );
 			}
 			else{
@@ -221,8 +226,9 @@ bool TCP_Socket::setUpAddress(void){
 	hints.ai_protocol = IPPROTO_TCP;
 
 	struct sockaddr_in specified_addr;
-	string msg("checking for ");
-	setUpSpecificAddress(msg, specified_addr, my_port, my_ip);
+	string msg("Setting up address: ");
+	if(setUpSpecificAddress(msg, specified_addr, my_port, my_ip) == false)
+		cout << "Setting up address failed.";
 
 	const int yes=1;
 	if(isServer){
@@ -351,42 +357,3 @@ bool TCP_Socket::isEqual_address(struct sockaddr_in* lhs, struct sockaddr_in* rh
 	// cout << "address found " << endl;
 	return true;
 }
-
-/*
-int main(int argc, char** argv){
-
-	cout << "server ? 1== yes and 0 == no " << endl;
-
-	int isServer;
-	cin >> isServer;
-
-	string port = "10001";
-	string address = "10.0.3.15";
-
-	string my_port = "10003";
-
-	if(isServer){
-
-		TCP_Socket server1(port, address, true);
-
-		int bufLen = 1025;
-		char buf[bufLen];
-		memset(buf,0,bufLen);
-
-		TCP_Socket client;
-
-		if(server1.server_accept(client) == false){
-			cerr << "server accept failed" << endl;
-		}
-
-
-	}
-	else{
-		TCP_Socket client(port, address, my_port, address, false);
-		int numbytes=0;
-		client.send_to("Hi", 3, numbytes);
-		cout << "sent " << numbytes << " bytes " << endl;
-	}
-
-	return 0;
-}*/

@@ -1,6 +1,7 @@
 #ifndef TCP_SOCKET
 #define TCP_SOCKET
 
+#include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>

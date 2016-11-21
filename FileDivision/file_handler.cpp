@@ -9,11 +9,9 @@
 #include <fstream>
 #include <stdexcept>
 #include <sstream>
-
 #include "file_handler.h"
 
 using namespace std;
-
 
 File_manipulator::File_manipulator(string file_name){
 	file_path = getRealpath(file_name);
@@ -25,8 +23,6 @@ File_manipulator::File_manipulator(string file_name){
 }
 
 bool File_manipulator::makeChunks(string path_name){
-	//ifstream _ip_file;
-	//_ip_file.copyfmt(ip_file);
 
 	string path(path_name + file_name + "_dir");
 	int ret = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);

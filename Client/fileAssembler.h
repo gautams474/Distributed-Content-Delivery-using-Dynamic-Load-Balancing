@@ -1,19 +1,18 @@
 
 using namespace std;
 
-class File_manipulator{
+class File_Assembler{
 public:
 
-	File_manipulator(string file_name);
+	File_Assembler(string file_name);
 
 	/* Make file at specified path_name */
-	bool makeChunks(string path_name);
+	bool makeFiles(string path_name);
 
 	/* Make file at base_file_path */
-	bool makeChunks(){return makeChunks(base_file_path);};
+	bool makeFiles(){return makeChunks(base_file_path);};
 
 private:
-	ifstream ip_file;
 	ofstream op_file;
 	string file_name;
 	string file_path;
