@@ -12,6 +12,7 @@ struct server_data{
 	vector<double> net_stats;
 	vector<double> cpu_loads;
 	vector<double> tps_parts;
+	int file_size;
 };
 
 class Server{
@@ -29,7 +30,7 @@ class Server{
 	int file_start_index;
 	int file_end_index;
 
-	Server();
+	void init(server_data s);
 
 	void normalize(){
 		tps_load /= MAX_TPS_LOAD;
@@ -44,6 +45,8 @@ class Server{
 	vector<double> cpu_loads;
 	vector<double> tps_parts;
 	vector<double> net_stats;
+
+	void getLoads();
 
 	double getMax(vector<double> v){
 		int max = 0;
@@ -60,3 +63,7 @@ class Server{
 	}
 
 };
+
+void getWeightedLoad(Server &s);
+void getFileRange(Server &s, int &filecounter);
+void distributeLoad(Server s[3]);

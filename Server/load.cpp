@@ -64,7 +64,7 @@ vector<double> Load::getMetricFromFile(const char * filename, int offset, int co
 	return columns;
 }
 
-void Load::getData(){
+void Load::getData(loadPacket &lpack){
 
 	system("./script.sh");
 
@@ -88,8 +88,11 @@ void Load::getData(){
 	lpack.cpu_loads = Load::cpu_loads;
 	lpack.tps_parts = Load::tps_parts;
 
+	// get no. of chunks for that file
+	lpack.file_size = 100;
 }
-
+/*
+// test main
 int main(){
 	int i =0;
 	int N = 1; // no.of CPU cores
@@ -100,7 +103,7 @@ int main(){
 	// give me l.lpack
 }
 
-
+*/
 
 
 

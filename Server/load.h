@@ -5,7 +5,8 @@ struct loadPacket
 	vector<double> net_stats;
 	vector<double> cpu_loads;
 	vector<double> tps_parts;
-}lpack;
+	int file_size;
+};
 
 class Load{
 public:
@@ -13,7 +14,7 @@ public:
 	vector<double> cpu_loads;
 	vector<double> tps_parts;
 
-	void getData();
+	void getData(loadPacket &lpack);
 	
 private:
 	string split(string &s, char delim, int col);

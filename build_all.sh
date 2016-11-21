@@ -5,4 +5,5 @@ for i in $( ls ); do
 		then cd "$i" && make; cd ../;
 	fi;
 done
-cd NFV/ && g++ -I ./../Sockets/ receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o; cd ../
+cd NFV/ && g++ -I ./../Sockets/ -I ./../Server/ ./../Server/load.o load_distributer.o receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o; cd ../
+#TODO remove /Server and load.o from above

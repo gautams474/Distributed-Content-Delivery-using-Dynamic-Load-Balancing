@@ -2,12 +2,21 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include "load_distributer.h"
 
 using namespace std;
 
-Server::Server(){
+void Server::init(server_data s){
+	Server::cpu_loads = s.cpu_loads;
+	Server::tps_parts = s.tps_parts;
+	Server::net_stats = s.net_stats;
+	Server::file_size = s.file_size;
+	Server::getLoads();
+}
+
+void Server::getLoads(){
 	Server::tps_load = Server::getMax(Server::tps_parts);
 	Server::net_out = Server::net_stats[1];
 	Server::getPidWeight();	
@@ -33,6 +42,7 @@ void getWeightedLoad(Server &s){
 			s.normalize();
 			// allocate load %
 			s.load_percentage = 0.4*s.tps_load + 0.4*s.net_out + 0.2*s.cpu_load;
+			
 		}
 	} 
 				
@@ -45,10 +55,9 @@ void getFileRange(Server &s, int &filecounter){
 }
 
 
-int main(int argc, char** argv){
-
-	Server s[3];
-	int sum = 0, i, sum2 = 0;
+void distributeLoad(Server *s){
+	double sum = 0, sum2 = 0, roundsum = 0;
+	int i;
 	int filecounter = 0;
 	for(i = 0; i < 3; i++){
 		getWeightedLoad(s[i]);
@@ -62,7 +71,14 @@ int main(int argc, char** argv){
 
 	for(i = 0; i < 3; i++){
 		s[i].load_percentage /= sum2;
-		s[i].load_percentage = round(s[i].file_size*s[i].load_percentage);
+		if(i != 2){
+			s[i].load_percentage = round(s[i].file_size*s[i].load_percentage);
+			roundsum += s[i].load_percentage;
+		}
+		else{
+			s[i].load_percentage = s[i].file_size - roundsum;
+		}
+		cout<<"inside load_percentage "<<s[i].load_percentage<<endl;
 	}
 
 	for(i = 0; i < 3; i++){
