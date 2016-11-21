@@ -5,12 +5,14 @@
 
 using namespace std;
 
-void Server::init(server_data s){
+void Server::init(server_data s, const string &ip, const string &my_port){
 	Server::cpu_loads = s.cpu_loads;
 	Server::tps_parts = s.tps_parts;
 	Server::net_stats = s.net_stats;
 	Server::file_size = s.file_size;
 	Server::getLoads();
+	Server::ip_address = ip;
+	Server::port = my_port;
 }
 
 void Server::getLoads(){
