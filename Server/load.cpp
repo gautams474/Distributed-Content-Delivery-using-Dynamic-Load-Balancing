@@ -8,7 +8,7 @@
 #include <sstream>
 #include <fstream>
 
-#include "load.h"
+#include <Server/load.h>
 
 using namespace std;
 
@@ -64,7 +64,7 @@ vector<double> Load::getMetricFromFile(const char * filename, int offset, int co
 	return columns;
 }
 
-void Load::getData(loadPacket &lpack){
+void Load::getData(loadPacket &lpack, int fileChunks){
 
 	system("./script.sh");
 
@@ -89,7 +89,7 @@ void Load::getData(loadPacket &lpack){
 	lpack.tps_parts = Load::tps_parts;
 
 	// get no. of chunks for that file
-	lpack.file_size = 100;
+	lpack.file_size = fileChunks;
 }
 /*
 // test main

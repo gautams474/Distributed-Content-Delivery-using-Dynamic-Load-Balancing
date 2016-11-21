@@ -49,6 +49,7 @@ private:
 	int new_fd;
 	bool isConnected;
 	bool isServer;
+	static const char delim = '^';
 
 	string dest_port;
 	string dest_address;

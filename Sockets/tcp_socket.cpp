@@ -11,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-#include "tcp_socket.h"
+#include <Sockets/tcp_socket.h>
 
 const int BACKLOG = 10;     // how many pending connections queue will hold
 using namespace std;
@@ -94,12 +94,14 @@ bool TCP_Socket::receiveData(char* buf, int bufLen, int& numbytes){
 		cerr << "cannot receive data as socket is not connected." << endl;
 		return false;
 	}
-	unsigned int total_numbytes=0;
-	while(total_numbytes != bufLen){
-		numbytes = recv(sockfd, buf, bufLen-total_numbytes, MSG_WAITALL);
-		total_numbytes += numbytes;
+	unsigned int recvdBytes=0;
+	while(recvdBytes != bufLen){
+		numbytes = recv(sockfd, buf, bufLen-recvdBytes, MSG_WAITALL);
+		recvdBytes += numbytes;
+		if(buf[recvdBytes] == delim)
+				break;
 	}
-	numbytes = total_numbytes;
+	numbytes = recvdBytes;
 	return true;
 }
 

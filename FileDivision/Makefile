@@ -5,3 +5,4 @@ all:
 
 clean:
 	rm *.o
+	rm *.out
