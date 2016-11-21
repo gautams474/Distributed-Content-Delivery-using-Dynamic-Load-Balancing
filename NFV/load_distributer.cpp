@@ -7,13 +7,6 @@
 
 using namespace std;
 
-struct server_data{
-	int cores;
-	vector<double> net_stats;
-	vector<double> cpu_loads;
-	vector<double> tps_parts;
-};
-
 Server::Server(){
 	Server::tps_load = Server::getMax(Server::tps_parts);
 	Server::net_out = Server::net_stats[1];

@@ -9,3 +9,5 @@ done
 
 g++ Client/client.o Sockets/tcp_socket.o -o Client/toRun.o
 chmod +x Client/toRun.o
+
+cd NFV/ && g++ -I ./../Sockets/ receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o; cd ../

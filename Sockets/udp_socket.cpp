@@ -148,11 +148,17 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		printf("listener: waiting to recvfrom...\n");
 
 		addr_len = sizeof(their_addr);
-		if((numbytes = recvfrom(sockfd, buf, bufLen , 0, (struct sockaddr *)&their_addr, &addr_len)) == -1){
-			perror("recvfrom");
-			exit(1);
+		int recvdBytes = 0;
+		while(recvdBytes != bufLen){
+			if((numbytes = recvfrom(sockfd, &(buf[recvdBytes]), bufLen-recvdBytes,0 , (struct sockaddr *)&their_addr, &addr_len)) == -1){
+				perror("recvfrom");
+				return false;
+			}
+			recvdBytes += numbytes;
+			if(buf[recvdBytes] == delim)
+				break;
 		}
-
+		numbytes = recvdBytes;
 		return getAddress_n_port(dest_port, dest_address, their_addr);
 	}
 
@@ -326,7 +332,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		return true;
 	}
 
-
+/*
 int main(void){
 
 	string port = "10001";
@@ -347,4 +353,4 @@ int main(void){
 	cout << "Received: " << buf << endl;
 
     return 0;
-}
+}*/

@@ -3,7 +3,6 @@
 #include <errno.h>
 #include <cstring>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -358,42 +357,3 @@ bool TCP_Socket::isEqual_address(struct sockaddr_in* lhs, struct sockaddr_in* rh
 	// cout << "address found " << endl;
 	return true;
 }
-
-
-// int main(int argc, char** argv){
-
-// 	cout << "server ? 1== yes and 0 == no " << endl;
-
-// 	int isServer;
-// 	cin >> isServer;
-
-// 	string port = "10001";
-// 	string address = "10.0.3.15";
-
-// 	string my_port = "10003";
-
-// 	if(isServer){
-
-// 		TCP_Socket server1(port, address, true);
-
-// 		int bufLen = 1025;
-// 		char buf[bufLen];
-// 		memset(buf,0,bufLen);
-
-// 		TCP_Socket client;
-
-// 		if(server1.server_accept(client) == false){
-// 			cerr << "server accept failed" << endl;
-// 		}
-
-
-// 	}
-// 	else{
-// 		TCP_Socket client(port, address, my_port, address, false);
-// 		int numbytes=0;
-// 		client.send_to("Hi", 3, numbytes);
-// 		cout << "sent " << numbytes << " bytes " << endl;
-// 	}
-
-// 	return 0;
-// }
