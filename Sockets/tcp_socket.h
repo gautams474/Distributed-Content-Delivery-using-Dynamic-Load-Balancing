@@ -1,6 +1,10 @@
 #ifndef TCP_SOCKET
 #define TCP_SOCKET
 
+#include <netinet/in.h>
+#include <netdb.h>
+#include <unistd.h>
+
 using namespace std;
 
 class TCP_Socket{
