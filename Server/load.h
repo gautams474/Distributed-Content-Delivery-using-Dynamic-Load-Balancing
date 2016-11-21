@@ -1,3 +1,4 @@
+#include <vector>
 
 using namespace std;
 struct loadPacket
@@ -14,7 +15,7 @@ public:
 	vector<double> cpu_loads;
 	vector<double> tps_parts;
 
-	void getData(loadPacket &lpack);
+	void getData(loadPacket &lpack, int fileChunks);
 	
 private:
 	string split(string &s, char delim, int col);

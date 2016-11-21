@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "./../Sockets/tcp_socket.h"
+#include <Sockets/tcp_socket.h>
 
 int main(int argc, char** argv){
 

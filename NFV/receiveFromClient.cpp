@@ -3,10 +3,9 @@
 #include <string>
 #include <iostream>
 
-#include "tcp_socket.h"
-#include "udp_socket.h"
-#include "load_distributer.h"
-//#include "load.h"
+#include <Sockets/tcp_socket.h>
+#include <Sockets/udp_socket.h>
+#include <NFV/load_distributer.h>
 
 using namespace std;
 
