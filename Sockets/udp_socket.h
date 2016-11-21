@@ -20,7 +20,7 @@ public:
 
 	bool send_to(char* buf, int len, int& numbytes); //1
 
-	bool send_to(char* buf, int len, int& numbytes, string& dest_port, string dest_address);
+	bool send_to(char* buf, int len, int& numbytes, const string& dest_port, const string dest_address);
 
 	bool start_receiving(char* buf, int bufLen, int& numbytes, string& dest_port, string& dest_address);
 

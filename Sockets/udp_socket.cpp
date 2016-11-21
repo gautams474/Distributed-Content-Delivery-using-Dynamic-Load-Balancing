@@ -102,7 +102,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		
 	}
 
-	bool UDP_Socket::send_to(char* buf, int len, int& numbytes, string& dest_port, string dest_address){
+	bool UDP_Socket::send_to(char* buf, int len, int& numbytes, const string& dest_port, const string dest_address){
 
 		struct sockaddr_in specified_addr;
 		memset(&specified_addr, 0, sizeof(specified_addr));

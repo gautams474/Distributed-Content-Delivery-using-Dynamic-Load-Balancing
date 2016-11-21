@@ -8,7 +8,6 @@ const int NO_OF_SERVERS = 3;
 
 
 struct server_data{
-	int cores;
 	vector<double> net_stats;
 	vector<double> cpu_loads;
 	vector<double> tps_parts;
@@ -22,15 +21,14 @@ class Server{
 	double tps_load;
 	double net_out;
 	
-	int cores;
-
 	double load_percentage;
-	string interface;
+	string ip_address;
+	string port;
 	int file_size;
 	int file_start_index;
 	int file_end_index;
 
-	void init(server_data s);
+	void init(server_data s,const string &ip, const string &my_port);
 
 	void normalize(){
 		tps_load /= MAX_TPS_LOAD;

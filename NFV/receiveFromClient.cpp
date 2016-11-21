@@ -6,21 +6,17 @@
 #include "tcp_socket.h"
 #include "udp_socket.h"
 #include "load_distributer.h"
+#include "NFV.h"
 //#include "load.h"
 
 using namespace std;
 
-const string NFV_IP = "192.168.1.7";
-string url;
-string server_ip;
-string portToServer = "10000";
-string dest_port = "10000";
 
-bool receiveFromClient(string &packet){
-	string portToClient = "10000";
-	TCP_Socket nfv_client_server(portToClient,NFV_IP,1);
+bool NFV::receiveFromClient(string &packet, int &bytes){
+	
+	TCP_Socket nfv_client_server(NFV::PortToClient,NFV::NFV_IP,1);
 	bool status = true;
-	int bytes;
+	//int bytes;
 	
 	TCP_Socket client;
 	status = nfv_client_server.server_accept(client);
@@ -42,53 +38,62 @@ bool receiveFromClient(string &packet){
 	return status;
 }
 
-bool broadcastToServer(UDP_Socket &socket){
+bool NFV::broadcastToServer(UDP_Socket &socket, int bytes, string packet){
 	bool ret;
-	int bytes;
-	ret = socket.send_to((char *)url.c_str(), 150, bytes, dest_port, server_ip);
-	if(ret == false){
-		cout<<"send to server failed"<<endl;
+	for(int i = 0; i< 3; i++){
+		ret = socket.send_to((char *)packet.c_str(), 150, bytes, NFV::dest_port, NFV::server_ip[i]);
+		if(ret == false){
+			cout<<"send to server failed"<<endl;
+			return ret;
+		}
 	}
 	return ret;
 }
 
 
-bool receiveLoadFromServer(UDP_Socket &socket){
+bool NFV::receiveLoadFromServer(UDP_Socket &socket){
 	int no_of_servers = 3, i = 0;
 	bool status;
 	server_data s[3];
 	Server servers[3];
 	int bytes;
+	string dest_port_recv[3];
+	string server_ip_recv[3];
 	while( i < no_of_servers){
-		status = socket.start_receiving((char *)&s[i], sizeof(server_data), bytes, dest_port, server_ip);
+		status = socket.start_receiving((char *)&s[i], sizeof(server_data), bytes, dest_port_recv[i], server_ip_recv[i]);
 		if(status == false){
 			return status;
 		}
 		i++;
 	}
-	for(i =0 ; i<3; i++){
-		servers[i].init(s[i]);
+	for(i =0 ; i<3 ; i++){
+		servers[i].init(s[i],server_ip_recv[i],dest_port_recv[i]);
 	}
 	distributeLoad(servers);
 	// send get Content request to servers
-
+	return true;
 }
 
-void testLoadDist();
+//void testLoadDist();
 
 int main(){
-	
+	int bytes; // returned by receive from client, used by broadcast to server
 	bool ret;
-	
-	UDP_Socket nfv_server(portToServer,NFV_IP,1);
+	string url;
+
+	NFV nfv;
+	UDP_Socket nfv_server(nfv.PortToServer,nfv.NFV_IP,1);
 
 	// continuous thread 1
 	while(1){
-		ret = receiveFromClient(url);
+		ret = nfv.receiveFromClient(url,bytes);
 		if(ret){
 			// convert url to ip address
 			// send to server;
-			
+			ret = nfv.broadcastToServer(nfv_server,bytes,url);
+			if(ret){
+				nfv.receiveLoadFromServer(nfv_server);
+			}
 		}
 	}
 	//testLoadDist();
