@@ -6,19 +6,32 @@
 using namespace std;
 
 void Server::init(server_data s, const string &ip, const string &my_port){
-	Server::cpu_loads = s.cpu_loads;
-	Server::tps_parts = s.tps_parts;
-	Server::net_stats = s.net_stats;
-	Server::file_size = s.file_size;
-	Server::getLoads();
-	Server::ip_address = ip;
-	Server::port = my_port;
+	
+	cpu_loads = s.cpu_loads;
+	tps_parts = s.tps_parts;
+	net_stats = s.net_stats;
+	file_size = s.file_size;
+	cout << "file size = " << file_size << endl;
+	if(file_size == 0){
+		cout << "got nack" << endl;
+		cpu_load = 0;
+		tps_load = 0;
+		net_out =  0;
+		file_start_index = -1;
+		file_end_index = -1;
+	}
+	else{
+		getLoads();
+	}
+	
+	ip_address = ip;
+	port = my_port;
 }
 
 void Server::getLoads(){
-	Server::tps_load = Server::getMax(Server::tps_parts);
-	Server::net_out = Server::net_stats[1];
-	Server::getPidWeight();	
+	tps_load = getMax(tps_parts);
+	net_out = net_stats[1];
+	getPidWeight();	
 }
 
 void getWeightedLoad(Server &s){
@@ -48,9 +61,12 @@ void getWeightedLoad(Server &s){
 }
 
 void getFileRange(Server &s, int &filecounter){
+	if(s.load_percentage == 0)
+		return;
 	s.file_start_index = filecounter;
 	s.file_end_index = s.file_start_index + s.load_percentage;
 	filecounter = s.file_end_index + 1;
+
 }
 
 
@@ -64,11 +80,15 @@ void distributeLoad(Server *s){
 	}
 
 	for(i = 0; i < 3; i++){
+		if(s[i].load_percentage == 0)
+			continue;
 		s[i].load_percentage = sum/s[i].load_percentage;
 		sum2 += s[i].load_percentage;
 	}
 
 	for(i = 0; i < 3; i++){
+		if(s[i].load_percentage == 0)
+			continue;
 		s[i].load_percentage /= sum2;
 		if(i != 2){
 			s[i].load_percentage = round(s[i].file_size*s[i].load_percentage);
@@ -82,6 +102,7 @@ void distributeLoad(Server *s){
 
 	for(i = 0; i < 3; i++){
 		getFileRange(s[i],filecounter);
+		cout<<"server "<<i<<" start index :"<<s[i].file_start_index<<" end index : "<<s[i].file_end_index<<endl;
 	}
 
 }

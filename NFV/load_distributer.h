@@ -35,7 +35,7 @@ class Server{
 	void normalize(){
 		tps_load /= MAX_TPS_LOAD;
 		net_out /= MAX_NET_LOAD;
-		for(int i = 0; i<3; i++){
+		for(int i = 0; i<cpu_loads.size(); i++){
 			cpu_loads[i] /= MAX_CPU_LOAD;
 		}
 		

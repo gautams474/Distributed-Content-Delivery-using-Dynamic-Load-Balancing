@@ -3,6 +3,7 @@
 using namespace std;
 struct loadPacket
 {
+	// replace vectors with arrays
 	vector<double> net_stats;
 	vector<double> cpu_loads;
 	vector<double> tps_parts;

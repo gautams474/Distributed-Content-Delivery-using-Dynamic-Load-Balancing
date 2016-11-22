@@ -4,22 +4,25 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string>
+#include <Sockets/tcp_socket.h>
 #include <Sockets/udp_socket.h>
 #include <Server/load.h>
+#include <NFV/NFV.h>
 	
 using namespace std;
 
 inline bool file_exists (const string& name) {
-	struct stat buffer;   
-	return (stat (name.c_str(), &buffer) == 0  && S_ISDIR(buffer.st_mode)); 
+	return true;
+	// struct stat buffer;   
+	// return (stat (name.c_str(), &buffer) == 0  && S_ISDIR(buffer.st_mode)); 
 }
 
 
 /* Acting as a server to NFV */
-void Server_NFV(){
+void Server_NFV(int serverNo){
 	const string base_path = "/home/prameet/ACN-Project/Content/";
-	string my_port = "10000";
-	string my_address = "10.3.15.5";
+	string my_port = NFV::server_port;//"10000";
+	string my_address = NFV::server_ip[serverNo];//"10.3.15.5";
 	UDP_Socket server(my_port, my_address, 1);
 	
 	string dest_port;
@@ -42,33 +45,40 @@ void Server_NFV(){
 			continue;
 		}
 
-		url[bytes] = '\0';
+		url[bytes-1] = '\0';
 		string s_url = url;
 		s_url = base_path + s_url.substr(s_url.find("GET\r\n") + strlen("GET\r\n"));
+
+		cout << "Checking for " << s_url << endl;
 		if(file_exists(s_url) == false){
 			//SEND NACK
+			cout << "File not found. Sending NACK." << endl;
 			loadPacket lpack;
 			lpack.file_size = 0;
 			if(server.send_to((char*) &lpack, sizeof(lpack), numBytes, dest_port, dest_address) == false){
 				cout << "Could not send NACK succesfully. Sent " << bytes << " bytes of data." << endl;
 				continue;
 			}
+			continue;
 		}
 
 		/************ Get File Chunks ************/
-		FILE *fp;
-		string command = "/bin/ls " + s_url + " -l | wc -l";
+		/* TO DO Remove comments */
+		// FILE *fp;
+		// string command = "/bin/ls " + s_url + " -l | wc -l";
 
-		fp = popen(command.c_str(), "r");
-		if (fp == NULL) {
-			cerr << "Failed to run command\n";
-			cout << "Failed to run command\n";
-			continue;
-		}
+		// fp = popen(command.c_str(), "r");
+		// if (fp == NULL) {
+		// 	cerr << "Failed to run command\n";
+		// 	cout << "Failed to run command\n";
+		// 	continue;
+		// }
 		
-		int fileChunks;
-		fscanf(fp, "%d", &fileChunks);
-		pclose(fp);
+		// int fileChunks;
+		// fscanf(fp, "%d", &fileChunks);
+		// pclose(fp);
+		/* TO DO Remove below line */
+		int fileChunks = 10;
 		/*****************************************/
 
 		/************* Load Calulate *************/
@@ -79,7 +89,7 @@ void Server_NFV(){
 
 		/************* Send load to nfv *************/
 		if(server.send_to((char*) &lpack, sizeof(lpack), numBytes, dest_port, dest_address) == false){
-			cout << "Could not send NACK succesfully. Sent " << bytes << " bytes of data." << endl;
+			cout << "Could not send ACK succesfully. Sent " << bytes << " bytes of data." << endl;
 			continue;
 		}
 		cout << "Sent ACK for " << url << endl;
@@ -89,6 +99,10 @@ void Server_NFV(){
 
 int main(int argc, char** argv){
 
-	Server_NFV();
+	cout << "Server num ? " << endl;
+	int serverNo;
+	cin >> serverNo;
+
+	Server_NFV(serverNo);
 	return 0;
 }
