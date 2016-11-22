@@ -22,10 +22,19 @@ int main(int argc, char** argv){
 		cout << "Could not send all data. Sent " << bytesSent << " bytes." <<  endl;
 		client.close_connection();
 	}
-	cout << "Data Sent Succesfully." << endl;
+	cout << "Request Sent Succesfully." << endl;
+
+	int bytesRecvd;
+	int fileSize;
+	if(client.receiveData(&fileSize, sizeof(int), bytesRecvd) == false){
+		cout << "Could not receive all data. Received " << bytesRecvd << " bytes." <<  endl;
+	}
+	else{
+		cout << "fileSize: " fileSize << endl;
+	}
+
 
 	// char buf[64];
-	// int bytesRecvd;
 	// if(client.receiveData(buf, 64, bytesRecvd) == false)
 	// 	cout << "Could not receive all data. Received " << bytesRecvd << " bytes." <<  endl;
 	while(1);
