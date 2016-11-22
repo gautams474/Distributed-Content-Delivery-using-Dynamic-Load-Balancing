@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <thread>
 
 #include <Sockets/tcp_socket.h>
 #include <Sockets/udp_socket.h>
@@ -11,10 +12,7 @@
 
 using namespace std;
 
-
 bool NFV::receiveFromClient(TCP_Socket &socket, TCP_Socket &client_socket, char *packet, int &bytes){
-	
-	
 	bool status = true;
 	//int bytes;
 	
@@ -39,7 +37,7 @@ bool NFV::receiveFromClient(TCP_Socket &socket, TCP_Socket &client_socket, char 
 
 bool NFV::broadcastToServer(UDP_Socket &socket, int packet_len, int& bytes, char *packet){
 	bool ret;
-	for(int i = 0; i< 3; i++){
+	for(int i = 0; i< no_of_servers; i++){
 		ret = socket.send_to(packet, packet_len, bytes, NFV::server_port, NFV::server_ip[i]);
 		if(ret == false){
 			cout<<"send to server failed"<<endl;
@@ -50,16 +48,16 @@ bool NFV::broadcastToServer(UDP_Socket &socket, int packet_len, int& bytes, char
 }
 
 
-bool NFV::receiveLoadFromServer(UDP_Socket &socket){
-	int no_of_servers = 3, i = 0;
+bool NFV::receiveLoadFromServer(UDP_Socket &udp_socket, Server servers[no_of_servers]){
+	int  i = 0;
 	bool status;
-	server_data s[3];
-	Server servers[3];
+	server_data s[no_of_servers];
+	//Server servers[no_of_servers];
 	int bytes;
-	string dest_port_recv[3];
-	string server_ip_recv[3];
+	string dest_port_recv[no_of_servers];
+	string server_ip_recv[no_of_servers];
 	while( i < no_of_servers){
-		status = socket.start_receiving((char *)&s[i], sizeof(server_data), bytes, dest_port_recv[i], server_ip_recv[i]);
+		status = udp_socket.start_receiving((char *)&s[i], sizeof(server_data), bytes, dest_port_recv[i], server_ip_recv[i]);
 		if(status == false){
 			cout<<"NFV receive from Server failed"<<endl;
 			return status;
@@ -67,16 +65,45 @@ bool NFV::receiveLoadFromServer(UDP_Socket &socket){
 		cout<<"NFV received from server"<<endl;
 		i++;
 	}
-	//check for nack
-	for(i =0 ; i<3 ; i++){
+	
+	for(i =0 ; i<no_of_servers ; i++){
 		servers[i].init(s[i],server_ip_recv[i],dest_port_recv[i]);
 	}
 	distributeLoad(servers);
-	// send get Content request to servers
+	
 	return true;
 }
 
-//void testLoadDist();
+// thread function
+void NFV_Server_TCPSend(TCP_Socket *soc, content_packet *cpack){
+	int bytes;
+	bool status;
+	char buf[64];
+
+	status = soc->send_to((char*)&cpack, sizeof(cpack), bytes);
+	if(status == false){
+		cout<<"send to server failed"<<endl;
+		return;
+	}
+	
+	status = soc->receiveData(buf, 64, bytes);
+	delete [] cpack;
+	delete soc;
+}
+
+void NFV::getContentRequest(Server s[no_of_servers], char *url, int urlLength){
+
+	content_packet *cpack = new content_packet[no_of_servers];
+	//content_packet cpack[3];
+	for(int i=0;i<no_of_servers;i++){
+		if(s[i].load_percentage > 0){
+			s[i].makeContentPacket(cpack[i], url, urlLength);
+			TCP_Socket* server_soc = new TCP_Socket(s[i].port, s[i].ip_address, NFV::PortToServer, NFV::NFV_IP,0);
+			thread(NFV_Server_TCPSend, server_soc, &cpack[i]);
+		}
+	}
+	//return true;
+}
 
 int main(){
 	int bytes; // returned by receive from client, used by broadcast to server
@@ -100,8 +127,11 @@ int main(){
 			int recvdbytes;
 			ret = nfv.broadcastToServer(nfv_server, bytes, recvdbytes, url);
 			if(ret){
+				Server s_data[no_of_servers];
 				cout<<"broadcast sent to all servers"<<endl;
-				nfv.receiveLoadFromServer(nfv_server);
+				ret = nfv.receiveLoadFromServer(nfv_server,s_data);
+				if(ret)
+					nfv.getContentRequest(s_data,url,bytes);
 			}
 		}else{
 			cout<<"receive failed"<<endl;

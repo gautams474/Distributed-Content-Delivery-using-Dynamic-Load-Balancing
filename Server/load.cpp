@@ -47,7 +47,7 @@ vector<double> Load::getMetricFromFile(const char * filename, int offset, int co
 		        	break;
 	    		if(!line.empty()){
 		        	column = split(line,' ', col);
-		        	value = stod(column,&sz);
+		        	value = stod(column,&sz);		
 		        	columns.push_back(value);
 		        	//break;
 		        	
@@ -62,6 +62,15 @@ vector<double> Load::getMetricFromFile(const char * filename, int offset, int co
 	else cout << "Unable to open file.";
 
 	return columns;
+}
+
+double Load::getMaxFromVector(vector<double> v){
+	double max = 0, i;
+	for(i =0 ; i<v.size() ; i++){
+		if(v[i] > max)
+			max = v[i];
+	}
+	return max;
 }
 
 void Load::getData(loadPacket &lpack, int fileChunks){
@@ -79,14 +88,17 @@ void Load::getData(loadPacket &lpack, int fileChunks){
 	Load::net_stats.insert( net_stats.end(), io_out.begin(), io_out.end() );
 
 	Load::tps_parts = getMetricFromFile("iolog.txt",13,2,-1);
+	disk_stat = getMaxFromVector(tps_parts);
 
 	for(int i=0;i<Load::cpu_loads.size();i++){
 		Load::cpu_loads[i] /= cores;
 	}	
-	// TODO vector to array functions
+	copy(cpu_loads.begin(), cpu_loads.end(), lpack.cpu_loads);
+	copy(net_stats.begin(), net_stats.end(), lpack.net_stats);
+	/*
 	lpack.net_stats = Load::net_stats;
-	lpack.cpu_loads = Load::cpu_loads;
-	lpack.tps_parts = Load::tps_parts;
+	lpack.cpu_loads = Load::cpu_loads;*/
+	lpack.disk_stat = Load::disk_stat;
 
 	// get no. of chunks for that file
 	lpack.file_size = fileChunks;

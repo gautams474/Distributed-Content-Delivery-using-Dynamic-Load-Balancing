@@ -1,5 +1,7 @@
 #include <math.h>
 #include <cstdlib>
+#include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <NFV/load_distributer.h>
 
@@ -7,16 +9,18 @@ using namespace std;
 
 void Server::init(server_data s, const string &ip, const string &my_port){
 	
-	cpu_loads = s.cpu_loads;
-	tps_parts = s.tps_parts;
-	net_stats = s.net_stats;
+	//cpu_loads = s.cpu_loads;
+	memcpy(cpu_loads,s.cpu_loads,sizeof(s.cpu_loads));
+	//net_stats = s.net_stats;
+	memcpy(net_stats, s.net_stats, sizeof(s.net_stats));
+	disk_stat = s.disk_stat;
 	file_size = s.file_size;
 	cout << "file size = " << file_size << endl;
 	if(file_size == 0){
 		cout << "got nack" << endl;
 		cpu_load = 0;
-		tps_load = 0;
-		net_out =  0;
+		disk_stat = 0;
+		net_out = 0;
 		file_start_index = -1;
 		file_end_index = -1;
 	}
@@ -29,9 +33,17 @@ void Server::init(server_data s, const string &ip, const string &my_port){
 }
 
 void Server::getLoads(){
-	tps_load = getMax(tps_parts);
+	//tps_load = getMax(disk_stat);
 	net_out = net_stats[1];
 	getPidWeight();	
+}
+
+void Server::makeContentPacket(content_packet &cpack, char *url, int length){
+	//cpack.url = url;
+	memcpy(cpack.url,url,150);
+	cpack.urlLength = length;
+	cpack.file_start_index = file_start_index;
+	cpack.file_end_index = file_end_index;
 }
 
 void getWeightedLoad(Server &s){
@@ -46,14 +58,14 @@ void getWeightedLoad(Server &s){
 			return;
 		}
 		else{
-			if(s.tps_load > MAX_TPS_LOAD){
+			if(s.disk_stat > MAX_TPS_LOAD){
 				s.load_percentage = 0;
 				return;
 			}
 			// normalize parameters
 			s.normalize();
 			// allocate load %
-			s.load_percentage = 0.4*s.tps_load + 0.4*s.net_out + 0.2*s.cpu_load;
+			s.load_percentage = 0.4*s.disk_stat + 0.4*s.net_out + 0.2*s.cpu_load;
 			
 		}
 	} 
