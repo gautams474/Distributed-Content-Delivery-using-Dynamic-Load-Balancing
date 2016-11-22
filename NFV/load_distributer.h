@@ -6,11 +6,17 @@
 
 using namespace std;
 
+struct content_packet{
+	char url[150];
+	int urlLength;
+	int file_start_index;
+	int file_end_index;
+};
+
 const double MAX_CPU_LOAD = 0.85;
 const double MAX_TPS_LOAD = 70;  
 const double MAX_NET_LOAD = 10000; //10MB/s
 const int NO_OF_SERVERS = 3;
-
 
 struct server_data{
 	double net_stats[2];

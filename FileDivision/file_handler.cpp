@@ -53,11 +53,13 @@ bool File_manipulator::makeChunks(string path_name){
 		else if(ip_file.eof()){
 			cout << "eof reached " << ip_file.gcount() << " bytes read. " << endl;
 		}
-		stringstream num; num << i;
+		stringstream num; num << i+1;
 		stringstream files(path + "/" + num.str());
 
 		cout << "data len " << strlen(data) <<  endl;
 		cout << "file path name " << files.str() << endl;
+
+		/*if ip file could be read from */
 		if(ip_file.gcount() > 0){
 			ofstream op_file(files.str().c_str(), ios::binary | ios::out);
 			op_file.write(data, ip_file.gcount());

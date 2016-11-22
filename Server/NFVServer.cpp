@@ -3,24 +3,31 @@
 #include <cstring>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <string>
+#include <thread>
+#include <list>
+
+#include <fstream>
+#include <stdexcept>
+#include <sstream>
+
 #include <Sockets/tcp_socket.h>
 #include <Sockets/udp_socket.h>
 #include <Server/load.h>
 #include <NFV/NFV.h>
+#include <NFV/load_distributer.h>
+#include <FileDivision/file_handler.h>
 	
 using namespace std;
 
+const int URL_Length = 150;
+
 inline bool file_exists (const string& name) {
-	return true;
-	// struct stat buffer;   
-	// return (stat (name.c_str(), &buffer) == 0  && S_ISDIR(buffer.st_mode)); 
+	struct stat buffer;   
+	return (stat (name.c_str(), &buffer) == 0  && S_ISDIR(buffer.st_mode)); 
 }
 
-
 /* Acting as a server to NFV */
-void Server_NFV(int serverNo){
-	const string base_path = "/home/prameet/ACN-Project/Content/";
+void server_NFV(int serverNo){
 	string my_port = NFV::server_port;//"10000";
 	string my_address = NFV::server_ip[serverNo];//"10.3.15.5";
 	UDP_Socket server(my_port, my_address, 1);
@@ -29,12 +36,11 @@ void Server_NFV(int serverNo){
 	string dest_address;
 	int bytes = 0;
 
-	const int URL_Length = 150;
-	char url[URL_Length];
+	char url[URL_Length+1];
 
 	bool status;
 
-	cout <<"Server Live ...." << endl;
+	cout <<"Server(UDP Port) Live ...." << endl;
 	while(1){
 		memset(url, 0, URL_Length+1);
 		int numBytes = 0;
@@ -47,7 +53,7 @@ void Server_NFV(int serverNo){
 
 		url[bytes-1] = '\0';
 		string s_url = url;
-		s_url = base_path + s_url.substr(s_url.find("GET\r\n") + strlen("GET\r\n"));
+		s_url = File_manipulator::base_file_path + s_url.substr(s_url.find("GET\r\n") + strlen("GET\r\n")) + "_dir";
 
 		cout << "Checking for " << s_url << endl;
 		if(file_exists(s_url) == false){
@@ -62,23 +68,20 @@ void Server_NFV(int serverNo){
 			continue;
 		}
 
-		/************ Get File Chunks ************/
-		/* TO DO Remove comments */
-		// FILE *fp;
-		// string command = "/bin/ls " + s_url + " -l | wc -l";
+		/************ Get Number of File Chunks ************/
+		FILE *fp;
+		string command = "/bin/ls " + s_url + " -l | wc -l";
 
-		// fp = popen(command.c_str(), "r");
-		// if (fp == NULL) {
-		// 	cerr << "Failed to run command\n";
-		// 	cout << "Failed to run command\n";
-		// 	continue;
-		// }
+		fp = popen(command.c_str(), "r");
+		if (fp == NULL) {
+			cerr << "Failed to run command\n";
+			cout << "Failed to run command\n";
+			continue;
+		}
 		
-		// int fileChunks;
-		// fscanf(fp, "%d", &fileChunks);
-		// pclose(fp);
-		/* TO DO Remove below line */
-		int fileChunks = 10;
+		int fileChunks;
+		fscanf(fp, "%d", &fileChunks);
+		pclose(fp);
 		/*****************************************/
 
 		/************* Load Calulate *************/
@@ -97,12 +100,95 @@ void Server_NFV(int serverNo){
 	}
 }
 
+void server_server_fn(TCP_Socket* connection){
+
+	struct content_packet FileData;
+	int bytesRecvd;
+	string s_url;
+	if(connection->receiveData((char*)&FileData, sizeof(FileData), bytesRecvd) == false){
+		cout << "Could not receive Data succesfully. Received " << bytesRecvd << " bytes of data." << endl;
+		goto end;
+	}
+
+	FileData.url[FileData.urlLength - 1] = '\0';
+	s_url = FileData.url;
+	s_url = File_manipulator::base_file_path + s_url.substr(s_url.find("GET\r\n") + strlen("GET\r\n")) + "_dir";
+
+	cout << "Checking for " << s_url << endl;
+	if(file_exists(s_url) == false){
+		throw runtime_error("ERROR: File not found.");
+		return;
+	}
+
+	cout <<  "Received Get Content for " << FileData.url << " start index: " << FileData.file_start_index <<
+				" end index: " << FileData.file_end_index << endl;
+
+	for(int i = FileData.file_start_index; i <= FileData.file_end_index; i++){
+		stringstream num; num << i;
+		stringstream files(s_url + "/" + num.str());
+		ifstream ip_file(files.str(), ifstream::in);
+
+		char data[File_manipulator::fileChunkLen + 1];
+		memset(data, 0, File_manipulator::fileChunkLen + 1);
+		ip_file.read(data, File_manipulator::fileChunkLen);
+		if(!ip_file.good() && !ip_file.eof()){
+			throw runtime_error("error reading from file. ");
+			return;
+		}
+		else if(ip_file.eof()){
+			cout << "eof reached " << ip_file.gcount() << " bytes read. " << endl;
+		}
+
+		/*if ip file could be read from */
+		int bytesSent;
+		if(ip_file.gcount() > 0){
+			if(connection->send_to(data, File_manipulator::fileChunkLen, bytesSent) == false){
+				cout << "Could not Send Data succesfully. Sent " << bytesSent << " bytes of data." << endl;
+				goto end;
+			}
+		}
+		else{
+			cout << "iteration" << i << "gcount less than 0 " << ip_file.gcount() << endl;
+			continue;
+		}
+		cout << i << " File Chunk Sent. " <<  endl;
+	}
+
+end:
+	//TO DO: Delete from the list
+	connection->close_connection();
+	delete connection;
+}
+/* Acting as a server to client */
+int server_server(int serverNo){
+
+	string my_port = NFV::server_port;//"10000";
+	string my_address = NFV::server_ip[serverNo];//"10.3.15.5";
+	TCP_Socket server(my_port, my_address, 1);
+	
+	list<thread> connections;
+	cout <<"Server(TCP Port) Live ...." << endl;
+	while(1){
+		TCP_Socket* newConnection = new TCP_Socket;
+		if(server.server_accept(*newConnection) == false){
+			cout << "Server accept failed" << endl;
+			continue;
+		}
+		connections.push_back(thread(server_server_fn, newConnection));
+	}
+}
+
 int main(int argc, char** argv){
 
 	cout << "Server num ? " << endl;
 	int serverNo;
 	cin >> serverNo;
 
-	Server_NFV(serverNo);
+	serverNo -= 1;
+	thread server_to_NFV(server_NFV, serverNo);
+	thread server_server_thread(server_server, serverNo);
+
+	server_to_NFV.join();
+	server_server_thread.join();
 	return 0;
 }
