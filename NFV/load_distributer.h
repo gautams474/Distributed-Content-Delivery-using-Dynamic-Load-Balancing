@@ -6,13 +6,6 @@
 
 using namespace std;
 
-struct content_packet{
-	char url[150];
-	int urlLength;
-	int file_start_index;
-	int file_end_index;
-};
-
 const double MAX_CPU_LOAD = 0.85;
 const double MAX_TPS_LOAD = 70;  
 const double MAX_NET_LOAD = 10000; //10MB/s
@@ -86,5 +79,6 @@ class Server{
 void getWeightedLoad(Server &s);
 void getFileRange(Server &s, int &filecounter);
 void distributeLoad(Server s[3]);
+int getMaxFileSize(Server *s);
 
 #endif

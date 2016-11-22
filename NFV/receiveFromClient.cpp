@@ -130,8 +130,14 @@ int main(){
 				Server s_data[no_of_servers];
 				cout<<"broadcast sent to all servers"<<endl;
 				ret = nfv.receiveLoadFromServer(nfv_server,s_data);
-				if(ret)
+				if(ret){
+					int nbytes;
+					int filesize = getMaxFileSize(s_data);
+					ret = client.send_to((char*)&filesize,sizeof(int), nbytes);
+					if(ret == false)
+						cout<<"sending file size to client failed"<<endl;
 					nfv.getContentRequest(s_data,url,bytes);
+				}
 			}
 		}else{
 			cout<<"receive failed"<<endl;

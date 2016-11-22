@@ -119,3 +119,12 @@ void distributeLoad(Server *s){
 
 }
 
+int getMaxFileSize(Server *s){
+	int max =0;
+	for(int i = 0; i < 3; i++){
+		if(s[i].file_size > max)
+			max = s[i].file_size;
+	}
+	return max;
+}
+
