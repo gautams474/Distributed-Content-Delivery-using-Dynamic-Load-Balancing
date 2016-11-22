@@ -29,6 +29,9 @@ int main(int argc, char** argv){
 	// if(client.receiveData(buf, 64, bytesRecvd) == false)
 	// 	cout << "Could not receive all data. Received " << bytesRecvd << " bytes." <<  endl;
 	while(1);
+
+	//To Do: Receive MetaData
+	//To Do: Send Final Ack
 	client.close_connection();
 	// client.receiveData();
 	return 0;
