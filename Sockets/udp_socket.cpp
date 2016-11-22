@@ -155,9 +155,14 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 				perror("recvfrom");
 				return false;
 			}
+
+			//cout << ""
 			recvdBytes += numbytes;
-			if(buf[recvdBytes] == delim)
+			if(buf[recvdBytes] == delim || buf[recvdBytes] == '\0')
 				break;
+			else{
+				cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
+			}
 		}
 		numbytes = recvdBytes;
 		return getAddress_n_port(dest_port, dest_address, their_addr);

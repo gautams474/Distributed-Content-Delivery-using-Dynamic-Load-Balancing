@@ -64,7 +64,7 @@ bool TCP_Socket::server_accept(TCP_Socket& newConnection){
 	}
 
 	struct sockaddr their_addr;
-	cout << "server: waiting for connections...\n" << endl;
+	cout << "server: " << my_ip << " " << my_port<< " waiting for connections...\n" << endl;
 	memset(&their_addr, 0, sizeof(their_addr));
 
 	socklen_t sin_size = sizeof(their_addr);
@@ -96,10 +96,14 @@ bool TCP_Socket::receiveData(char* buf, int bufLen, int& numbytes){
 	}
 	unsigned int recvdBytes=0;
 	while(recvdBytes != bufLen){
-		numbytes = recv(sockfd, buf, bufLen-recvdBytes, MSG_WAITALL);
+		numbytes = recv(sockfd, buf, bufLen-recvdBytes, 0);
 		recvdBytes += numbytes;
-		if(buf[recvdBytes] == delim)
+		cout << "received " << numbytes << " bytes" << endl; 
+		if(buf[recvdBytes-1] == delim || buf[recvdBytes-1] == '\0')
 				break;
+		else{
+			cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
+		}
 	}
 	numbytes = recvdBytes;
 	return true;

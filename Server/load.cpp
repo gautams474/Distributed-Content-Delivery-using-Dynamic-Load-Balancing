@@ -83,7 +83,7 @@ void Load::getData(loadPacket &lpack, int fileChunks){
 	for(int i=0;i<Load::cpu_loads.size();i++){
 		Load::cpu_loads[i] /= cores;
 	}	
-
+	// TODO vector to array functions
 	lpack.net_stats = Load::net_stats;
 	lpack.cpu_loads = Load::cpu_loads;
 	lpack.tps_parts = Load::tps_parts;
