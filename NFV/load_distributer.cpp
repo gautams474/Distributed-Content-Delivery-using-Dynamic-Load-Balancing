@@ -7,15 +7,14 @@
 
 using namespace std;
 
-void Server::init(server_data s, const string &ip, const string &my_port){
+void Server::init(loadPacket s, const string &ip, const string &my_port){
 	
-	//cpu_loads = s.cpu_loads;
 	memcpy(cpu_loads,s.cpu_loads,sizeof(s.cpu_loads));
-	//net_stats = s.net_stats;
 	memcpy(net_stats, s.net_stats, sizeof(s.net_stats));
 	disk_stat = s.disk_stat;
 	file_size = s.file_size;
-	cout << "file size = " << file_size << endl;
+	file_byte_size = s.file_byte_size;
+	cout << "File size = " << file_size << " .File byte size " << file_byte_size << endl;
 	if(file_size == 0){
 		cout << "got nack" << endl;
 		cpu_load = 0;
@@ -76,7 +75,7 @@ void getFileRange(Server &s, int &filecounter){
 	if(s.load_percentage == 0)
 		return;
 	s.file_start_index = filecounter;
-	s.file_end_index = s.file_start_index + s.load_percentage;
+	s.file_end_index = s.file_start_index + s.load_percentage -1;
 	filecounter = s.file_end_index + 1;
 
 }
@@ -85,7 +84,7 @@ void getFileRange(Server &s, int &filecounter){
 void distributeLoad(Server *s){
 	double sum = 0, sum2 = 0, roundsum = 0;
 	int i;
-	int filecounter = 0;
+	int filecounter = 1;
 	for(i = 0; i < 3; i++){
 		getWeightedLoad(s[i]);
 		sum += s[i].load_percentage;
@@ -114,7 +113,7 @@ void distributeLoad(Server *s){
 
 	for(i = 0; i < 3; i++){
 		getFileRange(s[i],filecounter);
-		cout<<"server "<<i<<" start index :"<<s[i].file_start_index<<" end index : "<<s[i].file_end_index<<endl;
+		cout << "server " << i << " start index :" << s[i].file_start_index <<" end index : "<< s[i].file_end_index << endl;
 	}
 
 }
@@ -122,8 +121,8 @@ void distributeLoad(Server *s){
 int getMaxFileSize(Server *s){
 	int max =0;
 	for(int i = 0; i < 3; i++){
-		if(s[i].file_size > max)
-			max = s[i].file_size;
+		if(s[i].file_byte_size > max)
+			max = s[i].file_byte_size;
 	}
 	return max;
 }

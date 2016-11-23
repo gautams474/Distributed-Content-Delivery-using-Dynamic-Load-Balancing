@@ -73,7 +73,7 @@ double Load::getMaxFromVector(vector<double> v){
 	return max;
 }
 
-void Load::getData(loadPacket &lpack, int fileChunks){
+void Load::getData(loadPacket &lpack, int fileChunks, int file_byte_size){
 
 	system("./script.sh");
 
@@ -102,6 +102,7 @@ void Load::getData(loadPacket &lpack, int fileChunks){
 
 	// get no. of chunks for that file
 	lpack.file_size = fileChunks;
+	lpack.file_byte_size = file_byte_size;
 }
 /*
 // test main

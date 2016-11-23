@@ -58,10 +58,10 @@ TCP_Socket::TCP_Socket(string source_port, string source_address, bool isServer)
 }
 
 bool TCP_Socket::server_accept(TCP_Socket& newConnection){
-	if(new_fd != 0){
-		close(new_fd);
-		new_fd = 0;
-	}
+	// if(new_fd != 0){
+	// 	close(new_fd);
+	// 	new_fd = 0;
+	// }
 
 	struct sockaddr their_addr;
 	cout << "server: " << my_ip << " " << my_port<< " waiting for connections...\n" << endl;
@@ -98,7 +98,10 @@ bool TCP_Socket::receiveData(char* buf, int bufLen, int& numbytes){
 	while(recvdBytes != bufLen){
 		numbytes = recv(sockfd, buf, bufLen-recvdBytes, 0);
 		recvdBytes += numbytes;
-		cout << "received " << numbytes << " bytes" << endl; 
+		if(recvdBytes == -1){
+			perror("Received -1 bytes: ");
+			return false;
+		}
 		if(buf[recvdBytes-1] == delim || buf[recvdBytes-1] == '\0')
 				break;
 		else{
@@ -118,7 +121,7 @@ bool TCP_Socket::connect_to_destination(void){
 	struct sockaddr_in specified_addr;
 	memset(&specified_addr, 0, sizeof(specified_addr));
 
-	cout << "my port " << dest_port << " my ip " << dest_address << endl;
+	// cout << "dest_port " << dest_port << " dest_address " << dest_address << endl;
 	int i_my_port;
 	int ret;
 	specified_addr.sin_family = AF_INET;
@@ -232,7 +235,7 @@ bool TCP_Socket::setUpAddress(void){
 	hints.ai_protocol = IPPROTO_TCP;
 
 	struct sockaddr_in specified_addr;
-	string msg("Setting up address: ");
+	string msg("Setting up for ");
 	if(setUpSpecificAddress(msg, specified_addr, my_port, my_ip) == false)
 		cout << "Setting up address failed.";
 
@@ -345,8 +348,8 @@ void TCP_Socket::printAddress(string msg, struct sockaddr* sa){
 }
 
 bool TCP_Socket::isEqual_address(struct sockaddr_in* lhs, struct sockaddr_in* rhs){
-	printAddress("checking if equal", (struct sockaddr*) lhs);
-	printAddress("to", (struct sockaddr*) rhs);
+	// printAddress("checking if equal", (struct sockaddr*) lhs);
+	// printAddress("to", (struct sockaddr*) rhs);
 	if(lhs->sin_family != rhs->sin_family){
 		cout << "sin_family !=" << endl;
 		return false;

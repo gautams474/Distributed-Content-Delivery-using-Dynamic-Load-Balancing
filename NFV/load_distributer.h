@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <Server/load.h>
 
 using namespace std;
 
@@ -11,12 +12,14 @@ const double MAX_TPS_LOAD = 70;
 const double MAX_NET_LOAD = 10000; //10MB/s
 const int NO_OF_SERVERS = 3;
 
-struct server_data{
-	double net_stats[2];
-	double cpu_loads[3];
-	double disk_stat;
-	int file_size;
-};
+/*ADD actual file size*/
+// struct server_data{
+// 	double net_stats[2];
+// 	double cpu_loads[3];
+// 	double disk_stat;
+// 	int file_size;
+// 	int file_byte_size;
+// };
 
 struct content_packet{
 	char url[150];
@@ -37,10 +40,11 @@ class Server{
 	string port;
 	
 	int file_size;
+	int file_byte_size;
 	int file_start_index;
 	int file_end_index;
 
-	void init(server_data s,const string &ip, const string &my_port);
+	void init(loadPacket s,const string &ip, const string &my_port);
 	void makeContentPacket(content_packet &cpack, char *url, int length);
 
 	void normalize(){

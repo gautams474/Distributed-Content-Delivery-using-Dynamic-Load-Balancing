@@ -13,6 +13,7 @@ int main(int argc, char** argv){
 	TCP_Socket client(NFV_port, NFV_ip, client_port, client_ip, false);
 
 	string request = "GET\r\nmy_file.txt^";
+	cout << "Request last character " << request.at(request.length() - 1) << endl;
 	int bytesSent = 0;
 	if(client.send_to(request.c_str(), request.length(), bytesSent) == false){
 		cout << "Could not send data succesfully. Sent " << bytesSent << " bytes." <<  endl;
@@ -24,13 +25,13 @@ int main(int argc, char** argv){
 	}
 	cout << "Request Sent Succesfully." << endl;
 
-	int bytesRecvd;
+	int bytesRecvd = 0;
 	int fileSize;
-	if(client.receiveData(&fileSize, sizeof(int), bytesRecvd) == false){
+	if(client.receiveData((char*)&fileSize, sizeof(int), bytesRecvd) == false){
 		cout << "Could not receive all data. Received " << bytesRecvd << " bytes." <<  endl;
 	}
 	else{
-		cout << "fileSize: " fileSize << endl;
+		cout << "fileSize: " << fileSize << " bytes." << endl;
 	}
 
 

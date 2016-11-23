@@ -11,8 +11,8 @@ done
 
 g++ Client/client.o Sockets/tcp_socket.o -o Client/Client.out
 
-cd NFV/ && g++ load_distributer.o receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o -o NFV.out; cd ../
-cd Server/ && g++ ./../Sockets/udp_socket.o ./../Sockets/tcp_socket.o ./../Server/load.o NFVServer.o -o NFVServer.out; cd ../
+cd NFV/ && g++ -pthread load_distributer.o receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o -o NFV.out; cd ../
+cd Server/ && g++ -pthread ./../Sockets/udp_socket.o ./../Sockets/tcp_socket.o ./../Server/load.o NFVServer.o -o NFVServer.out; cd ../
 
 # cd NFV/ && g++ -I ./../Sockets/ -I ./../Server/ ./../Server/load.o load_distributer.o receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o; cd ../
 #TODO remove /Server and load.o from above

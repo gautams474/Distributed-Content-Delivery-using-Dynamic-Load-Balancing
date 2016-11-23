@@ -27,7 +27,7 @@ bool File_manipulator::makeChunks(string path_name){
 	string path(path_name + file_name + "_dir");
 	int ret = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 	if(ret < 0){
-		perror("Could not make directory ");
+		perror("Could not make directory: ");
 		return false;
 	}
 
@@ -40,6 +40,11 @@ bool File_manipulator::makeChunks(string path_name){
 
 	cout << "path " << path << endl;
 	cout << "size: " << file_stats.st_size << " numChunks " << numChunks << endl;
+
+	stringstream file_stat_file(path + "/0");
+	ofstream op_file(file_stat_file.str().c_str(), ios::out);
+	op_file << file_stats.st_size << endl;
+	op_file.close();
 	
 	for(int i=0; i< numChunks; i++){
 
@@ -101,7 +106,7 @@ string File_manipulator::getFileName(string fileName){
 
 int main(int argc, char** argv){
 
-	File_manipulator fm("/home/prameet/ACN-Project/Content/empty");
+	File_manipulator fm("/users/prameets/Content/my_file.txt");
 	fm.makeChunks();
 	return 0;
 }

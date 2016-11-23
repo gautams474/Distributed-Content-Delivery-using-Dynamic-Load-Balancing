@@ -1,7 +1,7 @@
 
 
 all:
-	g++ file_handler.cpp -o file_handler.o
+	g++ file_handler.cpp -o file_handler.out
 
 clean:
 	rm *.o

@@ -146,7 +146,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		socklen_t addr_len;
 
 		memset(&their_addr, 0, sizeof(their_addr));
-		printf("listener: waiting to recvfrom...\n");
+		cout << "UDP Socket: Waiting for data...\n" << endl;
 
 		addr_len = sizeof(their_addr);
 		int recvdBytes = 0;
@@ -209,7 +209,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		hints.ai_protocol = IPPROTO_UDP;
 		
 		struct sockaddr_in specified_addr;
-		string msg("checking for ");
+		string msg("Setting up for ");
 		setUpSpecificAddress(msg, specified_addr, my_port, my_ip);
 
 		const int yes=1;
@@ -319,8 +319,8 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 	}
 
 	bool UDP_Socket::isEqual_address(struct sockaddr_in* lhs, struct sockaddr_in* rhs){
-		printAddress("checking if equal", (struct sockaddr*) lhs);
-		printAddress("to", (struct sockaddr*) rhs);
+		// printAddress("checking if equal", (struct sockaddr*) lhs);
+		// printAddress("to", (struct sockaddr*) rhs);
 		if(lhs->sin_family != rhs->sin_family){
 			cout << "sin_family !=" << endl;
 			return false;
