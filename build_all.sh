@@ -9,7 +9,7 @@ for i in $( ls ); do
 	fi;
 done
 
-g++ Client/client.o Sockets/tcp_socket.o -o Client/Client.out
+g++ -pthread Client/client.o Sockets/tcp_socket.o -o Client/Client.out
 
 cd NFV/ && g++ -pthread load_distributer.o receiveFromClient.o ./../Sockets/tcp_socket.o ./../Sockets/udp_socket.o -o NFV.out; cd ../
 cd Server/ && g++ -pthread ./../Sockets/udp_socket.o ./../Sockets/tcp_socket.o ./../Server/load.o NFVServer.o -o NFVServer.out; cd ../

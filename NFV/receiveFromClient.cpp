@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <thread>
+#include <list>
 
 #include <Sockets/tcp_socket.h>
 #include <Sockets/udp_socket.h>
@@ -85,18 +86,20 @@ void NFV_Server_TCPSend(TCP_Socket *soc, content_packet *cpack){
 		cout<<"send to server failed"<<endl;
 		return;
 	}
-	while(1);
+	
 	status = soc->receiveData(buf, 64, bytes);
 	if(status == false){
 		cout<<"receive from server failed"<<endl;
 		return;
 	}
 	cout << "Received " << bytes << " bytes of data." << endl;
-	// delete [] cpack;
-	// delete soc;
+
+	delete [] cpack;
+	delete soc;
+	// erase list 
 }
 
-void NFV::getContentRequest(Server s[no_of_servers], char *url, int urlLength){
+void NFV::getContentRequest(Server s[no_of_servers], char *url, int urlLength, list<thread> &threadList){
 
 	content_packet *cpack = new content_packet[no_of_servers];
 	//content_packet cpack[3];
@@ -104,8 +107,8 @@ void NFV::getContentRequest(Server s[no_of_servers], char *url, int urlLength){
 		if(s[i].load_percentage > 0){
 			s[i].makeContentPacket(cpack[i], url, urlLength);
 			TCP_Socket* server_soc = new TCP_Socket(s[i].port, s[i].ip_address, NFV::PortToServer, NFV::NFV_IP,0);
-			thread th1(NFV_Server_TCPSend, server_soc, &cpack[i]);
-			th1.join();
+			threadList.push_back(thread(NFV_Server_TCPSend, server_soc, &cpack[i]));
+			//th1.join();
 		}
 	}
 	//return true;
@@ -142,7 +145,8 @@ int main(){
 					ret = client.send_to((char*)&filesize,sizeof(int), nbytes);
 					if(ret == false)
 						cout<<"sending file size to client failed"<<endl;
-					nfv.getContentRequest(s_data,url,bytes);
+					list<thread> tList;
+					nfv.getContentRequest(s_data, url, bytes, tList);
 				}
 			}
 		}else{
