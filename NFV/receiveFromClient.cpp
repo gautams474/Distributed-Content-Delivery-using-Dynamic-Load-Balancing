@@ -92,8 +92,8 @@ void NFV_Server_TCPSend(TCP_Socket *soc, content_packet *cpack){
 		return;
 	}
 	cout << "Received " << bytes << " bytes of data." << endl;
-	// delete [] cpack;
-	// delete soc;
+	delete [] cpack;
+	delete soc;
 }
 
 void NFV::getContentRequest(Server s[no_of_servers], char *url, int urlLength){
