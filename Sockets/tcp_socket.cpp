@@ -94,6 +94,7 @@ bool TCP_Socket::receiveData(char* buf, int bufLen, int& numbytes){
 		cerr << "cannot receive data as socket is not connected." << endl;
 		return false;
 	}
+	numbytes = 0;
 	unsigned int recvdBytes=0;
 	while(recvdBytes != bufLen){
 		numbytes = recv(sockfd, buf, bufLen-recvdBytes, 0);
@@ -102,11 +103,13 @@ bool TCP_Socket::receiveData(char* buf, int bufLen, int& numbytes){
 			perror("Received -1 bytes: ");
 			return false;
 		}
-		if(buf[recvdBytes-1] == delim || buf[recvdBytes-1] == '\0')
-				break;
-		else{
-			cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
+		if(recvdBytes > 0){ 
+			if(buf[recvdBytes-1] == delim || buf[recvdBytes-1] == '\0')
+					break;
 		}
+		// else{
+		// 	cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
+		// }
 	}
 	numbytes = recvdBytes;
 	return true;
@@ -181,7 +184,8 @@ bool TCP_Socket::setDestination(string port, string address, bool shouldConnect)
 }
 
 bool TCP_Socket::send_to(const char* buf,const int len, int& numbytes){
-	if(!isConnected){
+	if(isConnected == false){
+		numbytes = 0;
 		cerr << "dest_address and port is not connected to"<< endl;
 		return false;
 	}

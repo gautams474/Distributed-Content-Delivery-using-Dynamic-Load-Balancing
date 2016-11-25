@@ -37,12 +37,12 @@ void Server::getLoads(){
 	getPidWeight();	
 }
 
-void Server::makeContentPacket(content_packet &cpack, char *url, int length){
+void Server::makeContentPacket(content_packet *cpack, char *url, int length){
 	//cpack.url = url;
-	memcpy(cpack.url,url,150);
-	cpack.urlLength = length;
-	cpack.file_start_index = file_start_index;
-	cpack.file_end_index = file_end_index;
+	memcpy(cpack->url,url,150);
+	cpack->urlLength = length;
+	cpack->file_start_index = file_start_index;
+	cpack->file_end_index = file_end_index;
 }
 
 void getWeightedLoad(Server &s){

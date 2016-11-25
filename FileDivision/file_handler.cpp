@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <climits>
-#include <fstream>
 #include <stdexcept>
 #include <sstream>
 #include <FileDivision/file_handler.h>
@@ -36,7 +35,13 @@ bool File_manipulator::makeChunks(string path_name){
 		perror("could not get file stats");
 		return false;
 	}
-	int numChunks = (file_stats.st_size + fileChunkLen-1) / fileChunkLen;
+	unsigned long long int numChunks = (file_stats.st_size + fileChunkLen-1) / fileChunkLen;
+
+	if(numChunks > 	9999999999ull){
+		throw runtime_error("number of file chunks exceeds max value of 9999999999");
+		return false;
+
+	}
 
 	cout << "path " << path << endl;
 	cout << "size: " << file_stats.st_size << " numChunks " << numChunks << endl;
@@ -46,7 +51,11 @@ bool File_manipulator::makeChunks(string path_name){
 	op_file << file_stats.st_size << endl;
 	op_file.close();
 	
-	for(int i=0; i< numChunks; i++){
+	for(unsigned long long int i=0; i< numChunks; i++){
+
+		char fileNum[13];
+		memset(fileNum, 0, 13);
+		snprintf(fileNum, 12, "%10llu \n", i+1);
 
 		char data[fileChunkLen + 1];
 		memset(data, 0, fileChunkLen + 1);
@@ -61,12 +70,15 @@ bool File_manipulator::makeChunks(string path_name){
 		stringstream num; num << i+1;
 		stringstream files(path + "/" + num.str());
 
-		cout << "data len " << strlen(data) <<  endl;
-		cout << "file path name " << files.str() << endl;
+		cout << "fileNum: " << fileNum << endl;
+
+		// cout << "data len " << strlen(data) <<  endl;
+		// cout << "file path name " << files.str() << endl;
 
 		/*if ip file could be read from */
 		if(ip_file.gcount() > 0){
-			ofstream op_file(files.str().c_str(), ios::binary | ios::out);
+			ofstream op_file(files.str().c_str(), ios::out | ios::app | ios::binary);
+			op_file.write(fileNum, 12);
 			op_file.write(data, ip_file.gcount());
 			op_file.close();
 		}
@@ -74,8 +86,9 @@ bool File_manipulator::makeChunks(string path_name){
 			cout << "gcount less than 0 " << ip_file.gcount() << endl;
 			return false;
 		}
-		cout << ip_file.gcount() << " bytes written to " << files.str() << endl;
+		// cout << ip_file.gcount() << " bytes written to " << files.str() << endl;
 	}
+	cout << "File chunks Made" << endl;
 	return true;
 }
 
@@ -106,6 +119,7 @@ string File_manipulator::getFileName(string fileName){
 
 int main(int argc, char** argv){
 
+	// File_manipulator fm("Content/my_file.txt");
 	File_manipulator fm("/users/prameets/Content/my_file.txt");
 	fm.makeChunks();
 	return 0;

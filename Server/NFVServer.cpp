@@ -143,18 +143,18 @@ void server_server_fn(TCP_Socket* connection){
 		stringstream files(s_url + "/" + num.str());
 		ifstream ip_file(files.str(), ifstream::in);
 
-		char data[File_manipulator::fileChunkLen + 1];
-		memset(data, 0, File_manipulator::fileChunkLen + 1);
-		ip_file.read(data, File_manipulator::fileChunkLen);
+		char data[File_manipulator::fileChunkLen + 12];
+		memset(data, 0, File_manipulator::fileChunkLen + 12);
+		ip_file.read(data, File_manipulator::fileChunkLen + 12);
 		if(!ip_file.good() && !ip_file.eof()){
 			throw runtime_error("error reading from file. ");
 			return;
 		}
-
-		/*if ip file could be read from */
-		int bytesSent;
+		
+		/*gCount > 0 if ip file could be read from */
+		int bytesSent = 0;
 		if(ip_file.gcount() > 0){
-			if(connection->send_to(data, File_manipulator::fileChunkLen, bytesSent) == false){
+			if(connection->send_to(data, ip_file.gcount() /*File_manipulator::fileChunkLen*/, bytesSent) == false){
 				cout << "Could not Send Data succesfully. Sent " << bytesSent << " bytes of data." << endl;
 				goto end;
 			}

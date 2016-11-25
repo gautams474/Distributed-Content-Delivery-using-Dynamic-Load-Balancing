@@ -45,7 +45,7 @@ class Server{
 	int file_end_index;
 
 	void init(loadPacket s,const string &ip, const string &my_port);
-	void makeContentPacket(content_packet &cpack, char *url, int length);
+	void makeContentPacket(content_packet *cpack, char *url, int length);
 
 	void normalize(){
 		if(file_size == 0)

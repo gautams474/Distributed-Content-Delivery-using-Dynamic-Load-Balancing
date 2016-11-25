@@ -1,4 +1,7 @@
+#ifndef FILE_HANDLER_H
+#define FILE_HANDLER_H
 
+#include <fstream>
 using namespace std;
 
 class File_manipulator{
@@ -25,4 +28,7 @@ private:
 	string getFileName(string fileName);
 };
 
-const string File_manipulator::base_file_path = "/users/prameets/Content/"; 
+const string File_manipulator::base_file_path = "/users/prameets/Content/";
+// const string File_manipulator::base_file_path = "Content/"; 
+
+#endif
