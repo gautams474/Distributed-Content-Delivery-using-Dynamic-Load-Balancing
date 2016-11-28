@@ -43,8 +43,8 @@ bool File_manipulator::makeChunks(string path_name){
 
 	}
 
-	cout << "path " << path << endl;
-	cout << "size: " << file_stats.st_size << " numChunks " << numChunks << endl;
+	// cout << "path " << path << endl;
+	// cout << "size: " << file_stats.st_size << " numChunks " << numChunks << endl;
 
 	stringstream file_stat_file(path + "/0");
 	ofstream op_file(file_stat_file.str().c_str(), ios::out);
@@ -65,15 +65,15 @@ bool File_manipulator::makeChunks(string path_name){
 			return false;
 		}
 		else if(ip_file.eof()){
-			cout << "eof reached " << ip_file.gcount() << " bytes read. " << endl;
+			// cout << "eof reached " << ip_file.gcount() << " bytes read. " << endl;
 		}
 		stringstream num; num << i+1;
 		stringstream files(path + "/" + num.str());
 
-		cout << "fileNum: " << fileNum << endl;
+		// cout << "fileNum: " << fileNum << endl;
 
-		// cout << "data len " << strlen(data) <<  endl;
-		// cout << "file path name " << files.str() << endl;
+		// // cout << "data len " << strlen(data) <<  endl;
+		// // cout << "file path name " << files.str() << endl;
 
 		/*if ip file could be read from */
 		if(ip_file.gcount() > 0){
@@ -83,12 +83,12 @@ bool File_manipulator::makeChunks(string path_name){
 			op_file.close();
 		}
 		else{
-			cout << "gcount less than 0 " << ip_file.gcount() << endl;
+			// cout << "gcount less than 0 " << ip_file.gcount() << endl;
 			return false;
 		}
-		// cout << ip_file.gcount() << " bytes written to " << files.str() << endl;
+		// // cout << ip_file.gcount() << " bytes written to " << files.str() << endl;
 	}
-	cout << "File chunks Made" << endl;
+	// cout << "File chunks Made" << endl;
 	return true;
 }
 

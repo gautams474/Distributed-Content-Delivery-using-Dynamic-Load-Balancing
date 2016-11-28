@@ -21,7 +21,7 @@ int main(int argc, char** argv){
 	string delim = "^";
 	string file = "my_file.txt";
 	string request = "GET\r\n" + file + delim;
-	cout << "Request last character " << request.at(request.length() - 1) << endl;
+	// cout << "Request last character " << request.at(request.length() - 1) << endl;
 	int bytesSent = 0;
 	if(client.send_to(request.c_str(), request.length(), bytesSent) == false){
 		cout << "Could not send data succesfully. Sent " << bytesSent << " bytes." <<  endl;
@@ -64,24 +64,24 @@ int main(int argc, char** argv){
 
 		char s_fileNum[13];
 		memset(s_fileNum, 0, 13);
-		cout << "Receiving 12 bytes " <<  flush;
+		// cout << "Receiving 12 bytes " <<  flush;
 		if(client.receiveData(s_fileNum, 12, bytesRecvd) == false){
 			cout << "Could not receive all data. Received " << bytesRecvd << " bytes." <<  endl;
 			client.close_connection();
 			return -1;
 		}
 
-		cout << "Converting fileNum to unsigned Long " << s_fileNum << flush;
+		// cout << "Converting fileNum to unsigned Long " << s_fileNum << flush;
 		bytesRecvd = 0;
 		unsigned long long int fileNum = 0;
 		char* end;
 		fileNum = strtoull (s_fileNum, &end, 10);
-		cout << "Converted to " << fileNum << " " << flush;
+		// cout << "Converted to " << fileNum << " " << flush;
 
 		// sscanf(s_fileNum, "%10llu", &fileNum);
 
 		if(fileNum == numChunks){
-			cout << "last Chunk of size " << lastChunkSize << " " << flush;
+			// cout << "last Chunk of size " << lastChunkSize << " " << flush;
 			if(client.receiveData(data, lastChunkSize, bytesRecvd) == false){
 				cout << "Could not receive all data. Received " << bytesRecvd << " bytes." <<  endl;
 				client.close_connection();
@@ -96,16 +96,16 @@ int main(int argc, char** argv){
 			}
 		}
 
-		cout << "Received Data." << flush;
+		// cout << "Received Data." << flush;
 		stringstream num; num << fileNum; //num << fileNum;
 		stringstream files(chunk_path + "/" + num.str());
 
 		ofstream op_file(files.str().c_str(), ios::binary | ios::out);
 		op_file.write(data, bytesRecvd);
 		op_file.close();
-		/*check */
+		
 		bytes_remaining -= bytesRecvd; //FileChunkLen;
-		cout << "File written. " << bytes_remaining << " bytes remaining." << endl;
+		// cout << "File written. " << bytes_remaining << " bytes remaining." << endl;
 	}
 	
 	cout << "Received All Files" << endl;

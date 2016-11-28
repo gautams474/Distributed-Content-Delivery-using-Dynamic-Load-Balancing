@@ -72,9 +72,10 @@ bool NFV::receiveLoadFromServer(UDP_Socket &udp_socket, Server servers[no_of_ser
 // thread function
 void NFV_Server_TCPSend(TCP_Socket *server, content_packet *cpack, TCP_Socket* client, int filesize){
 	int bytes = 0;
-	cout << "sending cpack to servers." << endl;
-	
-	if(server->send_to((char*)cpack, sizeof(content_packet), bytes) == false){
+	bool status;
+	// cout << "sending cpack to servers." << endl;
+	status = server->send_to((char*)cpack, sizeof(content_packet), bytes);
+	if(status == false){
 		cout<<"send to server failed"<<endl;
 		return;
 	}
@@ -87,22 +88,23 @@ void NFV_Server_TCPSend(TCP_Socket *server, content_packet *cpack, TCP_Socket* c
 	for(int i= cpack->file_start_index; i <= cpack->file_end_index; i++){
 		char buf[fileChunkLen + 12];
 		memset(buf, 0, fileChunkLen + 12);
-
-		if(server->receiveData(buf, min(bytes_remaining, fileChunkLen) + 12, bytes) == false){
+		status = server->receiveData(buf, min(bytes_remaining, fileChunkLen) + 12, bytes);
+		if(status == false){
 			cout << "Could not receive from server. Received " << bytes << " bytes of data." << endl;
 			return;
 		}
-		cout << "Received " << bytes << " bytes of data from server. \t" << flush;
+		// cout << "Received " << bytes << " bytes of data from server. \t" << flush;
 
-		if(client->send_to(buf, bytes, bytes) == false){
+		status = client->send_to(buf, bytes, bytes);
+		if(status == false){
 			cout << "Could not send to client. Sent " << bytes << " bytes of data." << endl;
 			return;
 		}
-		cout << "Sent " << bytes << " bytes of data to client." << endl;
+		// cout << "Sent " << bytes << " bytes of data to client." << endl;
 		bytes_remaining = bytes_remaining - fileChunkLen;
 	}
 
-	cout << "Sent all data bytes of data." << endl;
+	cout << "Sent all bytes of data." << endl;
 	delete cpack;
 	delete server;
 	//To Do: erase list
@@ -159,7 +161,7 @@ void manageServers(TCP_Socket* client){
 
 	cout << "Waiting for threads to join " << endl;
 	for_each(tList.begin(), tList.end(), do_join);
-	cout << "closing client connection client" << endl;
+	cout << "closing client connection" << endl;
 	client->close_connection();
 	cout << "deleting client" << endl;
 	delete client;
@@ -172,6 +174,7 @@ int main(){
 	bool status;
 	// continuous thread 1
 	// list<thread> tList;
+	cout << "Server Live " << endl;
 	while(1){
 		TCP_Socket* client = new TCP_Socket;
 		status = nfv_client_server.server_accept(*client);

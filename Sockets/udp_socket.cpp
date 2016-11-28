@@ -109,7 +109,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		memset(&specified_addr, 0, sizeof(specified_addr));
 
 		if(dest_port.length() > 0 && dest_address.length() > 0){
-			cout << "destination port " << my_port << " destination ip " << my_ip << endl;
+			// cout << "destination port " << my_port << " destination ip " << my_ip << endl;
 			int i_my_port;
 			int ret;
 			specified_addr.sin_family = AF_INET;
@@ -132,7 +132,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		// TO DO: Check this
 		struct sockaddr* send_addr = (struct sockaddr *)&specified_addr;
 
-		printAddress("send to address: ", send_addr);
+		// printAddress("send to address: ", send_addr);
 		if((numbytes = sendto(sockfd, buf, len, 0, send_addr, sizeof(*send_addr))) == -1){
 			perror("talker: sendto");
 			return false;
@@ -148,6 +148,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 		memset(&their_addr, 0, sizeof(their_addr));
 		cout << "UDP Socket: Waiting for data...\n" << endl;
 
+		numbytes = 0;
 		addr_len = sizeof(their_addr);
 		int recvdBytes = 0;
 		while(recvdBytes != bufLen){
@@ -155,14 +156,14 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 				perror("recvfrom");
 				return false;
 			}
-
-			//cout << ""
 			recvdBytes += numbytes;
-			if(buf[recvdBytes] == delim || buf[recvdBytes] == '\0')
-				break;
-			// else{
-			// 	cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
-			// }
+			if(recvdBytes > 0){
+				if(buf[recvdBytes-1] == delim || buf[recvdBytes-1] == '\0')
+					break;
+				// else{
+				// 	cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
+				// }
+			}
 		}
 		numbytes = recvdBytes;
 		return getAddress_n_port(dest_port, dest_address, their_addr);
@@ -263,7 +264,7 @@ UDP_Socket::UDP_Socket(string source_port, string source_address, bool isServer)
 			return false;
 		}
 
-		printAddress("Bound to", p->ai_addr);
+		// printAddress("Bound to", p->ai_addr);
 
 		freeaddrinfo(servinfo); // all done with this structure
 

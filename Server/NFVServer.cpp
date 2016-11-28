@@ -40,7 +40,7 @@ void server_NFV(int serverNo){
 
 	bool status;
 
-	cout <<"Server(UDP Port) Live ...." << endl;
+	cout <<"Server(UDP Port) Live ....\n" << endl;
 	while(1){
 		memset(url, 0, URL_Length+1);
 		int numBytes = 0;
@@ -50,7 +50,7 @@ void server_NFV(int serverNo){
 			cout << "Could not receive data succesfully. Received " << bytes << " bytes of data." << endl;
 			continue;
 		}
-		cout << "URL last char |" << url[bytes-1] << "|." << endl;
+		// cout << "URL last char |" << url[bytes-1] << "|." << endl;
 		url[bytes-1] = '\0';
 		string s_url = url;
 		string fileName = s_url.substr(s_url.find("GET\r\n") + strlen("GET\r\n"));
@@ -186,7 +186,7 @@ int server_server(int serverNo){
 	TCP_Socket server(my_port, my_address, 1);
 	
 	list<thread> connections;
-	cout <<"Server(TCP Port) Live ...." << endl;
+	cout <<"Server(TCP Port) Live ....\n" << endl;
 	while(1){
 		TCP_Socket* newConnection = new TCP_Socket();
 		if(server.server_accept(*newConnection) == false){
@@ -194,8 +194,9 @@ int server_server(int serverNo){
 			continue;
 		}
 
-		connections.push_back(thread(server_server_fn, newConnection));
-		cout << "Thread created." << endl;
+		thread t = thread(server_server_fn, newConnection);
+		t.join();
+		// cout << "Thread created." << endl;
 	}
 }
 

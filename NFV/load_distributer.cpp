@@ -108,7 +108,7 @@ void distributeLoad(Server *s){
 		else{
 			s[i].load_percentage = s[i].file_size - roundsum;
 		}
-		cout<<"inside load_percentage "<<s[i].load_percentage<<endl;
+		// cout<<"inside load_percentage "<<s[i].load_percentage<<endl;
 	}
 
 	for(i = 0; i < 3; i++){

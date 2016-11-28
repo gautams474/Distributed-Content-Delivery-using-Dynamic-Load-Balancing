@@ -27,17 +27,17 @@ TCP_Socket::TCP_Socket(string dest_port, string dest_address, string source_port
 		this->isServer = isServer;
 
 		if(setUpAddress() == false){
-			cout << "setting up address failed " << endl;
+			 cout << "setting up address failed " << endl;
 		}
 
 		if(isServer){
 			if(set_up_listening() == false){
-				cout << "setting up listening failed " << endl;
+				 cout << "setting up listening failed " << endl;
 			}
 		}
 
 		if(connect_to_destination() == false)
-			cout << "Can not connect to destination" << endl;
+			 cout << "Can not connect to destination" << endl;
 }
 
 TCP_Socket::TCP_Socket(string source_port, string source_address, bool isServer){
@@ -47,12 +47,12 @@ TCP_Socket::TCP_Socket(string source_port, string source_address, bool isServer)
 	this->isServer = isServer;
 
 	if(setUpAddress() == false){
-		cout << "setting up address failed " << endl;
+		 cout << "setting up address failed " << endl;
 	}
 
 	if(isServer){
 		if(set_up_listening() == false){
-			cout << "setting up listening failed " << endl;
+			 cout << "setting up listening failed " << endl;
 		}
 	}
 }
@@ -64,7 +64,7 @@ bool TCP_Socket::server_accept(TCP_Socket& newConnection){
 	// }
 
 	struct sockaddr their_addr;
-	cout << "server: " << my_ip << " " << my_port<< " waiting for connections...\n" << endl;
+	// cout << "server: " << my_ip << " " << my_port<< " waiting for connections...\n" << endl;
 	memset(&their_addr, 0, sizeof(their_addr));
 
 	socklen_t sin_size = sizeof(their_addr);
@@ -108,7 +108,7 @@ bool TCP_Socket::receiveData(char* buf, int bufLen, int& numbytes){
 					break;
 		}
 		// else{
-		// 	cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
+		// 	// cout << "last char != delim ---> |" << buf[recvdBytes] << "|" << endl;;
 		// }
 	}
 	numbytes = recvdBytes;
@@ -124,7 +124,7 @@ bool TCP_Socket::connect_to_destination(void){
 	struct sockaddr_in specified_addr;
 	memset(&specified_addr, 0, sizeof(specified_addr));
 
-	// cout << "dest_port " << dest_port << " dest_address " << dest_address << endl;
+	// // cout << "dest_port " << dest_port << " dest_address " << dest_address << endl;
 	int i_my_port;
 	int ret;
 	specified_addr.sin_family = AF_INET;
@@ -205,7 +205,7 @@ bool TCP_Socket::setUpSpecificAddress(string& msg, sockaddr_in& specified_addr, 
 		int i_my_port;
 		int ret;
 
-		cout << msg  << my_ip  << " " << my_port << endl;
+		// cout << msg  << my_ip  << " " << my_port << endl;
 
 		specified_addr.sin_family = AF_INET;
 
@@ -270,21 +270,21 @@ bool TCP_Socket::setUpAddress(void){
 		if(!isEqual_address((struct sockaddr_in*)(p->ai_addr), &specified_addr) && specified_addr.sin_family != 0)
 			continue;
 
-	if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-		perror("server: socket");
-		continue;
-	}
-	/*to remove the cannot bind to address*/
-	if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1){
-		perror("setsockopt");
-		exit(1);
-	}
-	if(bind(sockfd, p->ai_addr, p->ai_addrlen) == -1){
-		close(sockfd);
-		perror("server: bind");
-		continue;
-	}
-		break;
+		if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+			perror("server: socket");
+			continue;
+		}
+		/* SO_REUSEADDR to remove the cannot bind to address*/
+		if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1){
+			perror("setsockopt");
+			exit(1);
+		}
+		if(bind(sockfd, p->ai_addr, p->ai_addrlen) == -1){
+			close(sockfd);
+			perror("server: bind");
+			continue;
+		}
+			break;
 	}
 
 	if (p == NULL){
@@ -348,25 +348,25 @@ void TCP_Socket::printAddress(string msg, struct sockaddr* sa){
 		throw runtime_error("Could not print IP address");
 		return;
 	}
-	cout << msg << " " << addr_buf << " " << port << endl;
+	// cout << msg << " " << addr_buf << " " << port << endl;
 }
 
 bool TCP_Socket::isEqual_address(struct sockaddr_in* lhs, struct sockaddr_in* rhs){
 	// printAddress("checking if equal", (struct sockaddr*) lhs);
 	// printAddress("to", (struct sockaddr*) rhs);
 	if(lhs->sin_family != rhs->sin_family){
-		cout << "sin_family !=" << endl;
+		// cout << "sin_family !=" << endl;
 		return false;
 	}
 	if(lhs->sin_port != rhs->sin_port){
-		cout << "sin_port !=" << endl;
+		// cout << "sin_port !=" << endl;
 		return false;
 	}
 	if((lhs->sin_addr).s_addr != (rhs->sin_addr).s_addr){
-		cout << "sin_addr !=" << endl;
+		// cout << "sin_addr !=" << endl;
 		return false;
 	}
 
-	// cout << "address found " << endl;
+	// // cout << "address found " << endl;
 	return true;
 }
