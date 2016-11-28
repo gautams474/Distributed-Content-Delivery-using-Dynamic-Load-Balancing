@@ -6,6 +6,7 @@
 #include <FileDivision/file_handler.h>
 #include <NFV/NFV.h>
 #include <sys/stat.h>
+#include <chrono>
 
 int main(int argc, char** argv){
 
@@ -23,6 +24,8 @@ int main(int argc, char** argv){
 	string request = "GET\r\n" + file + delim;
 	// cout << "Request last character " << request.at(request.length() - 1) << endl;
 	int bytesSent = 0;
+	cout << chrono::high_resolution_clock::period::den << endl;
+	auto start_time = chrono::high_resolution_clock::now();
 	if(client.send_to(request.c_str(), request.length(), bytesSent) == false){
 		cout << "Could not send data succesfully. Sent " << bytesSent << " bytes." <<  endl;
 		client.close_connection();
@@ -126,7 +129,8 @@ int main(int argc, char** argv){
 	system(command.c_str());
 
 	cout << "Assembled Files" << endl;
-
+	auto end_time = chrono::high_resolution_clock::now();
+	cout << chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count() << ":";
 	// To Do: Merge Files
 	client.close_connection();
 	// client.receiveData();
